@@ -16,7 +16,7 @@
 
 ## Admin Dashboard
 - Link: ⚙ Admin (bottom of site footer)
-- Password: `CTTC@SuperAdmin2026`
+-
 
 ## Club Contacts
 - Email: citytabletennis@gmail.com
