@@ -14,9 +14,6 @@
 
 ---
 
-## Admin Dashboard
-- Link: ⚙ Admin (bottom of site footer)
--
 
 ## Club Contacts
 - Email: citytabletennis@gmail.com
