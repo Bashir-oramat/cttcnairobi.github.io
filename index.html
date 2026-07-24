@@ -106,6 +106,74 @@ nav{position:sticky;top:0;z-index:200;background:rgba(10,10,10,.97);backdrop-fil
 .pt{display:inline-block;margin-top:.8rem;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--or)}
 .pw{margin-top:.5rem;font-size:.72rem;color:rgba(255,255,255,.32)}
 /* GALLERY */
+    /* --- SLIDING GALLERY STYLES --- */
+.gallery-slider-section {
+  padding: 60px 5%;
+  background-color: var(--bg, #0a0a0a);
+  text-align: center;
+}
+
+.slider-wrapper {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-track-container {
+  overflow: hidden;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--br, rgba(255, 255, 255, 0.08));
+  background-color: var(--card-bg, #121212);
+}
+
+.slider-track {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+  will-change: transform;
+}
+
+.slider-track img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain; /* Keeps the whole image visible without cropping */
+  flex-shrink: 0;
+  background-color: #000; /* Adds black bars if image ratios differ */
+}
+
+/* Navigation Buttons */
+.slider-btn {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: var(--or, #ff6b00);
+  border: 2px solid var(--or, #ff6b00);
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: absolute;
+  z-index: 10;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slider-btn:hover {
+  background-color: var(--or, #ff6b00);
+  color: #fff;
+}
+
+.left-btn { left: -20px; }
+.right-btn { right: -20px; }
+
+@media (max-width: 768px) {
+  .left-btn { left: 5px; }
+  .right-btn { right: 5px; }
+}
 .gw{position:relative;margin-top:2.4rem;border-radius:16px;overflow:hidden;background:#111}
 .slider{display:flex;will-change:transform;transition:transform .42s cubic-bezier(.4,0,.2,1)}
 .slide{min-width:100%;height:460px;flex-shrink:0;position:relative;overflow:hidden}
@@ -304,7 +372,32 @@ footer{padding:2.5rem 4% max(1.5rem,env(safe-area-inset-bottom))!important;}
     <div><div class="n">🏆</div><div class="l">National Players</div></div>
   </div>
 </section>
+<!-- SLIDING GALLERY SECTION -->
+<section class="gallery-slider-section" id="gallery">
+  <div class="gallery-container">
+    <h2 class="section-title">Club Highlights</h2>
+    <p class="section-subtitle">Swipe or click to view our latest moments.</p>
+    
+    <div class="slider-wrapper">
+      <button class="slider-btn left-btn" onclick="moveGallery(-1)">&#10094;</button>
+      
+      <div class="slider-track-container">
+        <div class="slider-track" id="galleryTrack">
+          <!-- Note: Adjust the folder path if you rename it later -->
+          <img src="cttcimageplaceholder.txt/CTTC%20LEAGUE.jpg" alt="CTTC League">
+          <img src="cttcimageplaceholder.txt/ZAZL0096.jpg" alt="Table Tennis Action">
+          <img src="cttcimageplaceholder.txt/ZAZL0145.jpg" alt="Club Members">
+          <img src="cttcimageplaceholder.txt/ZAZL0195.jpg" alt="Tournament Play">
+          <img src="cttcimageplaceholder.txt/ZAZL0228.jpg" alt="Training Session">
+          <img src="cttcimageplaceholder.txt/ZAZL0295.jpg" alt="Match Highlight">
+          <img src="cttcimageplaceholder.txt/ZAZL0313.jpg" alt="Player Focus">
+        </div>
+      </div>
 
+      <button class="slider-btn right-btn" onclick="moveGallery(1)">&#10095;</button>
+    </div>
+  </div>
+</section>
 <section class="sd" id="about">
   <div class="sl">About CTTC</div>
   <div class="ag">
@@ -655,6 +748,28 @@ function renderMemTable(){var tb=document.getElementById('mem-tbody');if(!DB.mem
 function renderIPs(){var w=document.getElementById('ip-list');if(!DB.ips.length){w.innerHTML='<p style="color:var(--mu);font-size:.8rem;">No flagged IPs.</p>';return;}w.innerHTML=DB.ips.map(function(e){return'<div class="ipr"><span class="'+(e.blocked?'ipbl':'ipok')+'">'+(e.blocked?'BLOCKED':'OK')+' '+e.ip+'</span>'+(e.blocked?'<button class="unb" onclick="DB.unblockIP(\''+e.ip+'\')">Unblock</button>':'<button class="blb" onclick="DB.blockIP(\''+e.ip+'\')">Block</button>')+'</div>';}).join('');}
 function exportCSV(type){var data=type==='enq'?DB.enq:DB.mem;if(!data.length){showToast('No data.',true);return;}var keys=Object.keys(data[0]),rows=data.map(function(row){return keys.map(function(k){return'"'+String(row[k]||'').replace(/"/g,'""')+'"';}).join(',');});var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent([keys.join(',')].concat(rows).join('\n'));a.download='cttc_'+type+'_'+Date.now()+'.csv';a.click();}
 document.addEventListener('DOMContentLoaded',function(){initSlider();var modal=document.getElementById('modal');if(modal)modal.addEventListener('click',function(e){if(e.target.id==='modal')closeModal();});var ao=document.getElementById('admin-overlay');if(ao)ao.addEventListener('click',function(e){if(e.target.id==='admin-overlay')closeAdmin();});document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAdmin();});document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(ev){var href=a.getAttribute('href');if(href==='#')return;var target=document.querySelector(href);if(target){ev.preventDefault();target.scrollIntoView({behavior:'smooth',block:'start'});}var nl=document.getElementById('navlinks');if(nl&&nl.classList.contains('open')){nl.classList.remove('open');nl.style.cssText='';document.getElementById('hbg').textContent='\u2630';}});});});
+/* GALLERY SLIDER LOGIC */
+let currentGalleryIndex = 0;
+
+function moveGallery(direction) {
+  const track = document.getElementById('galleryTrack');
+  const images = track.querySelectorAll('img');
+  const totalImages = images.length;
+
+  // Calculate new index
+  currentGalleryIndex += direction;
+
+  // Loop back to start or end if bounds are reached
+  if (currentGalleryIndex < 0) {
+    currentGalleryIndex = totalImages - 1;
+  } else if (currentGalleryIndex >= totalImages) {
+    currentGalleryIndex = 0;
+  }
+
+  // Slide the track
+  const slidePercentage = -(currentGalleryIndex * 100);
+  track.style.transform = `translateX(${slidePercentage}%)`;
+}
 </script>
 </body>
-</html>
+</html>    
