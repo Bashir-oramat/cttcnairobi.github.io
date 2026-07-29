@@ -123,11 +123,15 @@ nav{position:sticky;top:0;z-index:200;background:rgba(10,10,10,.97);backdrop-fil
 }
 
 .slider-track-container {
-  overflow: hidden;
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid var(--br, rgba(255, 255, 255, 0.08));
-  background-color: var(--card-bg, #121212);
+    overflow: hidden;
+    width: 100%;
+    border-radius: 12px;
+    background-color: var(--card-bg, #121212);
+    border: none;
+    outline: none;
+    box-shadow: none;
+    user-select: none; /* Prevents text/image selection highlights during swipe */
+    -webkit-user-select: none;
 }
 
 .slider-track {
@@ -945,6 +949,94 @@ function moveGallery(direction) {
     checkConsent();
   };
 </script>
+<script>
+  const track = document.querySelector('.slider-track');
+  const slides = Array.from(track.children);
+  const nextBtn = document.querySelector('.slider-btn.next'); // adjust selectors if your buttons differ
+  const prevBtn = document.querySelector('.slider-btn.prev');
+  const container = document.querySelector('.slider-track-container');
+
+  let currentIndex = 0;
+  let autoSlideTimer = null;
+  const slideInterval = 4000; // 4 seconds
+
+  // Function to move to a specific slide index
+  function moveToSlide(index) {
+    if (index < 0) {
+      currentIndex = slides.length - 1;
+    } else if (index >= slides.length) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+  }
+
+  // Auto-Slide Control
+  function startAutoSlide() {
+    stopAutoSlide(); // Ensure no duplicate intervals
+    autoSlideTimer = setInterval(() => {
+      moveToSlide(currentIndex + 1);
+    }, slideInterval);
+  }
+
+  function stopAutoSlide() {
+    if (autoSlideTimer) clearInterval(autoSlideTimer);
+  }
+
+  // Start initial timer
+  startAutoSlide();
+
+  // Pause auto-sliding when user hovers or holds touch
+  container.addEventListener('mouseenter', stopAutoSlide);
+  container.addEventListener('mouseleave', startAutoSlide);
+
+  // Button navigation (if present)
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      moveToSlide(currentIndex + 1);
+      startAutoSlide(); // reset timer
+    });
+  }
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      moveToSlide(currentIndex - 1);
+      startAutoSlide(); // reset timer
+    });
+  }
+
+  // --- SWIPE & TOUCH FUNCTIONALITY ---
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+
+  container.addEventListener('touchstart', (e) => {
+    stopAutoSlide(); // Stop sliding while user is holding/touching
+    startX = e.touches[0].clientX;
+    isDragging = true;
+  }, { passive: true });
+
+  container.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    currentX = e.touches[0].clientX;
+  }, { passive: true });
+
+  container.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    const diffX = startX - currentX;
+
+    // Minimum swipe threshold (50px)
+    if (Math.abs(diffX) > 50) {
+      if (diffX > 0) {
+        moveToSlide(currentIndex + 1); // Swiped Left
+      } else {
+        moveToSlide(currentIndex - 1); // Swiped Right
+      }
+    }
+    
+    startAutoSlide(); // Resume auto-slide
+  });
 </script>
 </body>
 </html>    
